@@ -1,0 +1,4 @@
+// Attach this configuration to the iOS app target in the host Xcode workspace.
+SWIFT_VERSION = 5.9
+SWIFT_STRICT_CONCURRENCY = complete
+OTHER_SWIFT_FLAGS = $(inherited) -warn-concurrency -strict-concurrency=complete

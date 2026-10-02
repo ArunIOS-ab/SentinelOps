@@ -1,0 +1,30 @@
+name: SentinelOps CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_15.4.app
+      - name: Install swift-format
+        run: brew install swift-format
+      - name: Verify formatting
+        run: swift-format lint --recursive Sources Tests
+      - name: Run unit tests
+        run: swift test
+      - name: Validate model checksums
+        run: |
+          if [ -f Models/manifest.json ]; then
+            shasum -a 256 -c Models/checksums.txt
+          else
+            echo "No model manifest committed; checksum validation skipped."
+          fi

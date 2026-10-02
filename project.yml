@@ -1,0 +1,108 @@
+name: SentinelOps
+options:
+  bundleIdPrefix: com.sentinelops
+  deploymentTarget:
+    iOS: "17.0"
+  xcodeVersion: "15.0"
+configs:
+  Debug: debug
+  Staging: debug
+  Release: release
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    IPHONEOS_DEPLOYMENT_TARGET: "17.0"
+    TARGETED_DEVICE_FAMILY: "1,2"
+    SWIFT_STRICT_CONCURRENCY: complete
+    OTHER_SWIFT_FLAGS: "$(inherited) -warn-concurrency -strict-concurrency=complete"
+  configs:
+    Debug:
+      SWIFT_ACTIVE_COMPILATION_CONDITIONS: "DEBUG SENTINELOPS_TESTING"
+    Staging:
+      SWIFT_ACTIVE_COMPILATION_CONDITIONS: "STAGING SENTINELOPS_TESTING"
+    Release:
+      SWIFT_COMPILATION_MODE: wholemodule
+      GCC_TREAT_WARNINGS_AS_ERRORS: YES
+      SWIFT_TREAT_WARNINGS_AS_ERRORS: YES
+packages:
+  SentinelOps:
+    path: Packages/SentinelOps
+targets:
+  SentinelOps:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sources/SentinelOps
+    info:
+      path: Resources/Info.plist
+    entitlements:
+      path: Resources/SentinelOps.entitlements
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.sentinelops.app
+        PRODUCT_NAME: SentinelOps
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: ""
+    dependencies:
+      - package: SentinelOps
+        product: AppShell
+      - package: SentinelOps
+        product: AIInferenceEngine
+      - package: SentinelOps
+        product: SyncEngine
+      - package: SentinelOps
+        product: CoreDomain
+      - package: SentinelOps
+        product: CoreUI
+      - package: SentinelOps
+        product: Persistence
+  SentinelOpsTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: Tests/SentinelOpsTests
+    dependencies:
+      - target: SentinelOps
+      - package: SentinelOps
+        product: CoreDomain
+      - package: SentinelOps
+        product: SyncEngine
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.sentinelops.app.tests
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/SentinelOps.app/SentinelOps"
+        BUNDLE_LOADER: "$(TEST_HOST)"
+  SentinelOpsUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: Tests/SentinelOpsUITests
+    dependencies:
+      - target: SentinelOps
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.sentinelops.app.uitests
+schemes:
+  SentinelOps:
+    build:
+      targets:
+        SentinelOps: all
+        SentinelOpsTests: [test]
+        SentinelOpsUITests: [test]
+    run:
+      config: Debug
+      environmentVariables:
+        SENTINELOPS_TEST_MODE: YES
+        SENTINELOPS_DISABLE_REMOTE_SYNC: YES
+    test:
+      config: Debug
+      gatherCoverageData: true
+      targets:
+        - SentinelOpsTests
+        - SentinelOpsUITests
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release
